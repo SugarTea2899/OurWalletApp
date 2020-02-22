@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingLeft="30dp"
+    android:paddingRight="30dp">
+
+    <TextView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/logo"
+        android:textColor="@color/blue_logo"
+        android:textSize="35dp"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold"
+        android:layout_marginTop="50dp"/>
+
+    <EditText
+        android:padding="8dp"
+        android:id="@+id/edt_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/logo"
+        android:layout_marginTop="80dp"
+        android:hint="@string/enter_name"
+        android:textSize="20sp"
+        android:background="@drawable/rounded_edittext"/>
+
+    <EditText
+        android:padding="8dp"
+        android:id="@+id/edt_walletId"
+        android:layout_marginTop="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_edittext"
+        android:textSize="20sp"
+        android:hint="@string/wallet_id"
+        android:layout_below="@id/edt_name"/>
+
+    <EditText
+        android:padding="8dp"
+        android:id="@+id/edt_walletPass"
+        android:layout_marginTop="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_edittext"
+        android:textSize="20sp"
+        android:hint="@string/wallet_pass"
+        android:layout_below="@id/edt_walletId"/>
+
+    <Button
+        android:id="@+id/btn_connect"
+        android:padding="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/connect"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="#FFFFFF"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/edt_walletPass"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/border_button"/>
+
+    <TextView
+        android:id="@+id/tv_createNew"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_connect"
+        android:text="@string/create_new"
+        android:textStyle="italic"
+        android:textSize="18sp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="18dp"
+        android:layout_marginTop="20dp"/>
+</RelativeLayout>

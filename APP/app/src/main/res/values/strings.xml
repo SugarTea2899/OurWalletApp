@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="logo">Quản Lí Tiền Chung</string>
+    <string name="enter_name">Nhập tên người dùng</string>
+    <string name="wallet_id">Nhập ID ví</string>
+    <string name="wallet_pass">Nhập mật khẩu ví</string>
+    <string name="connect">Kết nối</string>
+    <string name="create_new">Tạo ví mới</string>
+    <string name="create">Tạo mới</string>
+    <string name="repeat_pass">Nhập lại mật khẩu</string>
+</resources>
