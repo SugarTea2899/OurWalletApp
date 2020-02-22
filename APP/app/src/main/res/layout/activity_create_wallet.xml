@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/logo"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="120dp"
         android:hint="@string/wallet_pass"
         android:textSize="20sp"
         android:background="@drawable/rounded_edittext"/>
@@ -40,11 +40,11 @@
         android:layout_below="@id/edt_enterPass"/>
 
     <Button
-        android:id="@+id/btn_connect"
+        android:id="@+id/btn_create"
         android:padding="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/connect"
+        android:text="@string/create"
         android:textStyle="bold"
         android:textSize="20sp"
         android:textColor="#FFFFFF"

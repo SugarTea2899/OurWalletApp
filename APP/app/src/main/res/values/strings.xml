@@ -8,4 +8,5 @@
     <string name="create_new">Tạo ví mới</string>
     <string name="create">Tạo mới</string>
     <string name="repeat_pass">Nhập lại mật khẩu</string>
+    <string name="choose_date">Chọn ngày để lọc</string>
 </resources>
