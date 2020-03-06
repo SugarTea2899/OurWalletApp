@@ -14,4 +14,8 @@ public class HistoryItemModel {
         this.value = value;
         this.isRevenues = isRevenues;
     }
+
+    public HistoryItemModel(){
+
+    }
 }

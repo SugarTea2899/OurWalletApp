@@ -9,4 +9,10 @@
     <string name="create">Tạo mới</string>
     <string name="repeat_pass">Nhập lại mật khẩu</string>
     <string name="choose_date">Chọn ngày để lọc</string>
+    <string name="enter_content">Nhập nội dung</string>
+    <string name="enter_value">Nhập sô tiền</string>
+    <string-array name="options">
+        <item>Thu</item>
+        <item>Chi</item>
+    </string-array>
 </resources>
