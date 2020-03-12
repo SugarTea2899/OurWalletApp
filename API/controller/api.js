@@ -11,7 +11,8 @@ module.exports = {
         if (wallet === null){
             res.status(404);
             res.send({
-                message: "ID not found"
+                message: "ID not found",
+                res: false
             });
         }
         else{
@@ -23,12 +24,15 @@ module.exports = {
                 });
                 await member.save();
 
-                res.json(wallet);
+                res.send({
+                    res: true
+                });
             }
             else{
                 res.status(404);
                 res.send({
-                    message: "Password not match"
+                    message: "Password not match",
+                    res: false
                 });
             }
         }
@@ -55,7 +59,8 @@ module.exports = {
             });
             await member.save();
             res.send({
-                message: "Create wallet successfully."
+                message: "Create wallet successfully.",
+                id: id
             })
         }catch(e){
             res.status(404);
@@ -69,6 +74,7 @@ module.exports = {
         const value = req.body.value;
         const isRevenue = req.body.isRevenue;
         const name = req.body.name;
+        const describe = req.body.describe;
         const now = new Date();
 
         const history =  new historyDB({
@@ -76,7 +82,8 @@ module.exports = {
             value: value,
             isRevenue: isRevenue,
             createOn: now,
-            name: name
+            name: name,
+            describe: describe
         });
 
         await history.save();
@@ -95,7 +102,7 @@ module.exports = {
             return;
         }
         try{
-            const history = await historyDB.find({walletId: id});
+            const history = await historyDB.find({walletId: id}).sort({createOn: -1});
             res.status(200).json(history);
         }catch(e){
             res.status(404).send({

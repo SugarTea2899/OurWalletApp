@@ -44,7 +44,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:text="+2.000.000"
+            android:text="+12.000.000đ"
             android:textColor="#FFFFFF"
             android:textAlignment="center"
             android:background="@drawable/border_button_red"

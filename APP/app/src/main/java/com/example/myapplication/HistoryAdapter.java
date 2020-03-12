@@ -34,10 +34,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
 
         holder.tvContent.setText(item.content);
         holder.tvDate.setText(item.date);
-        holder.tvUsername.setText(item.userName);
+        holder.tvUsername.setText(item.name);
         String temp = formatMoney(item.value);
 
-        if (item.isRevenues)
+        if (item.isRevenue)
             temp = "+" + temp;
         else
             temp = "-" + temp;
@@ -66,9 +66,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         }
     }
 
-    public static String formatMoney(String money){
+    public static String formatMoney(long money){
         int count = 0;
-        StringBuffer result = new StringBuffer(money);
+        StringBuffer result = new StringBuffer(money + "");
         for (int i = result.length() - 1; i > 0; i--){
             count++;
             if (count == 3){

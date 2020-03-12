@@ -7,7 +7,8 @@ const historySchema = new mongoose.Schema({
     walletId: Number,
     value: Number,
     isRevenue: Boolean,
-    createOn: Date
+    createOn: Date,
+    describe: String
 },{collection: 'history'});
 
 module.exports = mongoose.model('history', historySchema);

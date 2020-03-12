@@ -46,6 +46,7 @@
         android:layout_marginTop="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="textPassword"
         android:background="@drawable/rounded_edittext"
         android:textSize="20sp"
         android:hint="@string/wallet_pass"

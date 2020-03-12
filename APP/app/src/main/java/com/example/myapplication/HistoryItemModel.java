@@ -1,18 +1,22 @@
 package com.example.myapplication;
 
-public class HistoryItemModel {
-    public String content;
-    public String date;
-    public String userName;
-    public String value;
-    public boolean isRevenues;
+import com.google.gson.annotations.SerializedName;
 
-    public HistoryItemModel(String content, String date, String userName, String value, boolean isRevenues) {
+public class HistoryItemModel {
+    @SerializedName("describe")
+    public String content;
+    @SerializedName("createOn")
+    public String date;
+    public String name;
+    public long value;
+    public boolean isRevenue;
+
+    public HistoryItemModel(String content, String date, String userName, long value, boolean isRevenues) {
         this.content = content;
         this.date = date;
-        this.userName = userName;
+        this.name = userName;
         this.value = value;
-        this.isRevenues = isRevenues;
+        this.isRevenue = isRevenues;
     }
 
     public HistoryItemModel(){
