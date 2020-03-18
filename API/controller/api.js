@@ -1,11 +1,14 @@
 const walletDB = require('../models/wallet');
 const memberDB = require('../models/member');
 const historyDB = require('../models/history');
+const admin = require('../config/firebase');
+const fcmDB = require('../models/fcmToken');
 module.exports = {
     connectWallet: async function(req, res, next){
         const id = req.body.id;
         const pass = req.body.password;
         const memberName = req.body.memberName;
+        const fcmToken = req.body.fcmToken;
 
         const wallet = await walletDB.findOne({id: id});
         if (wallet === null){
@@ -22,6 +25,11 @@ module.exports = {
                     name: memberName,
                     walletId: id
                 });
+                const newFcm = new fcmDB({
+                    walletId: id,
+                    fcmToken: fcmToken
+                });
+                await newFcm.save();
                 await member.save();
 
                 res.send({
@@ -74,6 +82,7 @@ module.exports = {
         const value = req.body.value;
         const isRevenue = req.body.isRevenue;
         const name = req.body.name;
+        const fcm = req.body.fcmToken;
         const describe = req.body.describe;
         const now = new Date();
 
@@ -87,6 +96,24 @@ module.exports = {
         });
 
         await history.save();
+
+        const fcmTokens = await fcmDB.find({walletId: id});
+        const regTokenList = [];
+        for (i = 0; i < fcmTokens.length; i++){
+            regTokenList.push(fcmTokens[i].fcmToken);
+        }
+
+        const message = {
+            data: {
+                fcmToken: fcm,
+            },
+            tokens: regTokenList
+        }
+        console.log(regTokenList);
+        admin.messaging().sendMulticast(message)
+            .then((res) => {
+                console.log("successfully");
+            })
         res.send({
             res: true,
             message: "successful"

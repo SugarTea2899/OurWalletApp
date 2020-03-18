@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "964674815684",
+    "firebase_url": "https://wallet-fca43.firebaseio.com",
+    "project_id": "wallet-fca43",
+    "storage_bucket": "wallet-fca43.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:964674815684:android:91017ad8b3b28d1aae6b91",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "964674815684-fidge1q8flrgchnuq7ejbr37rf7k44a6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNzE0Zv3SYfQUCAPJVK6yyxrdollfrV3Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "964674815684-fidge1q8flrgchnuq7ejbr37rf7k44a6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

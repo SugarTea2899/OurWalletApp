@@ -1,16 +1,19 @@
 package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.app.VoiceInteractor;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -52,6 +55,12 @@ public class ManagementActivity extends AppCompatActivity {
     int id;
     long remain = 0, revenues = 0, expenditures = 0;
     String name;
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            loadHistory(id);
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,10 +69,16 @@ public class ManagementActivity extends AppCompatActivity {
         sharedPreferences =  getSharedPreferences("data", MODE_PRIVATE);
         id = sharedPreferences.getInt("id", 0);
         name = sharedPreferences.getString("name","trống");
-
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter("LoadAgain"));
         tvWalletId.setText("ID: " + id + "");
         loadHistory(id);
         setEvent();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 
     private void hideFunctionButton(){
@@ -115,8 +130,8 @@ public class ManagementActivity extends AppCompatActivity {
 
                 remain = revenues - expenditures;
                 tvRemain.setText(HistoryAdapter.formatMoney(remain));
-                tvRevenues.setText(revenues + "");
-                tvExpenditures.setText(expenditures + "");
+                tvRevenues.setText(HistoryAdapter.formatMoney(revenues));
+                tvExpenditures.setText(HistoryAdapter.formatMoney(expenditures));
                 item.name = name;
 
                 itemModels.add(0, item);
@@ -137,7 +152,7 @@ public class ManagementActivity extends AppCompatActivity {
             jsonObject.put("value", value);
             jsonObject.put("name", name);
             jsonObject.put("describe", describe);
-
+            jsonObject.put("fcmToken", MainActivity.fcmToken);
             final OkHttpClient httpClient = new OkHttpClient();
             RequestBody body = RequestBody.create(jsonObject.toString(), MainActivity.JSON);
             final Request request = new Request.Builder()
@@ -207,6 +222,8 @@ public class ManagementActivity extends AppCompatActivity {
         }
     }
     private void calculateMoney(){
+        revenues = 0;
+        expenditures = 0;
         for (int i = 0; i < itemModels.size(); i++){
             if (itemModels.get(i).isRevenue)
                 revenues += itemModels.get(i).value;

@@ -1,19 +1,25 @@
 package com.example.myapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.app.RemoteInput;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     EditText edtWalletPass;
     Button btnConnect;
     TextView tvCreateNew;
+    public static String fcmToken;
     public static final String ADDRESS = "https://wallet-api-quangthien.herokuapp.com/api/";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     @Override
@@ -41,6 +48,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getWidget();
 
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                if (task.isSuccessful()){
+                    fcmToken = task.getResult().getToken();
+                    Log.d("XXX", fcmToken);
+                }else{
+                    Log.d("XXX", "false");
+                }
+            }
+        });
 
         setEvent();
     }
@@ -54,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                     jsonObject.put("id", Integer.parseInt(edtWalletID.getText().toString()));
                     jsonObject.put("password", edtWalletPass.getText().toString());
                     jsonObject.put("memberName", edtUserName.getText().toString());
+                    jsonObject.put("fcmToken", fcmToken);
                     RequestBody body = RequestBody.create(jsonObject.toString(), JSON);
                     final Request request = new Request.Builder()
                             .url(ADDRESS + "connect-wallet")
@@ -127,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt("id", id);
         editor.putString("name", name);
         editor.putBoolean("isConnected", true);
+        editor.putString("fcmToken", fcmToken);
         editor.apply();
     }
     private void getWidget(){
