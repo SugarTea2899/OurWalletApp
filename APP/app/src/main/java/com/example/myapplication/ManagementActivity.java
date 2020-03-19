@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,8 +24,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
@@ -52,6 +57,7 @@ public class ManagementActivity extends AppCompatActivity {
     ArrayList <HistoryItemModel> itemModels;
     HistoryAdapter adapter;
     SharedPreferences sharedPreferences;
+    boolean doubleBackToExitPressedOnce = false;
     int id;
     long remain = 0, revenues = 0, expenditures = 0;
     String name;
@@ -77,8 +83,23 @@ public class ManagementActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        if (doubleBackToExitPressedOnce) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+            finishAffinity();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Click một lần nữa để thoát.", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
+
     }
 
     private void hideFunctionButton(){
@@ -267,7 +288,69 @@ public class ManagementActivity extends AppCompatActivity {
                 showAddNewDialog();
             }
         });
+
+
+        imgbQuit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                JSONObject  jsonObject = new JSONObject();
+                try{
+                    jsonObject.put("id", id);
+                    jsonObject.put("name", name);
+                    jsonObject.put("fcmToken", sharedPreferences.getString("fcmToken", ""));
+
+                    RequestBody body = RequestBody.create(jsonObject.toString(), MainActivity.JSON);
+                    final OkHttpClient okHttpClient = new OkHttpClient();
+                    final Request request = new Request.Builder()
+                            .url(MainActivity.ADDRESS + "quit-wallet")
+                            .post(body)
+                            .build();
+
+                    final ProgressDialog dialog = new ProgressDialog(ManagementActivity.this);
+                    dialog.setTitle("Đang thoát");
+                    dialog.setMessage("Xin chờ...");
+                    @SuppressLint("StaticFieldLeak") AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
+                        @Override
+                        protected String doInBackground(Void... voids) {
+                            try {
+                                publishProgress();
+                                Response response = okHttpClient.newCall(request).execute();
+                                if (response.isSuccessful())
+                                    return response.body().string();
+                                return null;
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                return null;
+                            }
+                        }
+
+                        @Override
+                        protected void onProgressUpdate(Void... values) {
+                            dialog.show();
+                        }
+
+                        @Override
+                        protected void onPostExecute(String s) {
+                            if (s == null)
+                            {
+                                Toast.makeText(getApplicationContext(), "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
+                            }else{
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putBoolean("isConnected", false);
+                                editor.apply();
+                                finish();
+                            }
+                            dialog.dismiss();
+                        }
+                    };
+                    asyncTask.execute();
+                }catch (Exception e){
+                    Log.d("Exception", e.getMessage());
+                }
+            }
+        });
     }
+
 
     private void getWidget(){
         itemModels = new ArrayList<HistoryItemModel>();

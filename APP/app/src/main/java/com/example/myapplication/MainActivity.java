@@ -59,7 +59,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
+        SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+        boolean isConnected = sharedPreferences.getBoolean("isConnected", false);
+        if (isConnected){
+            autoConnect(sharedPreferences.getInt("id", -1), sharedPreferences.getString("pass", ""),
+                    sharedPreferences.getString("name", ""), sharedPreferences.getString("fcmToken", ""));
+        }
         setEvent();
     }
 
@@ -73,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
                     jsonObject.put("password", edtWalletPass.getText().toString());
                     jsonObject.put("memberName", edtUserName.getText().toString());
                     jsonObject.put("fcmToken", fcmToken);
+                    jsonObject.put("isAuto", false);
                     RequestBody body = RequestBody.create(jsonObject.toString(), JSON);
                     final Request request = new Request.Builder()
                             .url(ADDRESS + "connect-wallet")
@@ -110,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (object.getBoolean("res") == false){
                                     Toast.makeText(getApplicationContext(), object.getString("message"), Toast.LENGTH_SHORT).show();
                                 }else{
-                                    saveToSharePre(Integer.parseInt(edtWalletID.getText().toString()), edtUserName.getText().toString());
+                                    saveToSharePre(Integer.parseInt(edtWalletID.getText().toString()),edtWalletPass.getText().toString(), edtUserName.getText().toString());
                                     Intent intent = new Intent(MainActivity.this, ManagementActivity.class);
                                     startActivity(intent);
                                 }
@@ -140,10 +146,76 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private void saveToSharePre(int id, String name){
+
+    private void autoConnect(int id, String pass, String name, String fcm){
+        JSONObject jsonObject = new JSONObject();
+        try{
+            jsonObject.put("id", id);
+            jsonObject.put("password", pass);
+            jsonObject.put("memberName", name);
+            jsonObject.put("fcmToken", fcm);
+            jsonObject.put("isAuto", true);
+            RequestBody body = RequestBody.create(jsonObject.toString(), JSON);
+            final Request request = new Request.Builder()
+                    .url(ADDRESS + "connect-wallet")
+                    .post(body)
+                    .build();
+
+            final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+            dialog.setTitle("Đang kết nối");
+            dialog.setMessage("Xin chờ...");
+
+            final OkHttpClient httpClient = new OkHttpClient();
+
+            @SuppressLint("StaticFieldLeak") AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
+                @Override
+                protected String doInBackground(Void... voids) {
+                    publishProgress();
+                    try {
+                        Response response = httpClient.newCall(request).execute();
+                        return response.body().string();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                }
+
+                @Override
+                protected void onProgressUpdate(Void... values) {
+                    dialog.show();
+                }
+
+                @Override
+                protected void onPostExecute(String s) {
+                    try {
+                        JSONObject object =  new JSONObject(s);
+                        if (object.getBoolean("res") == false){
+                            Toast.makeText(getApplicationContext(), object.getString("message"), Toast.LENGTH_SHORT).show();
+                        }else{
+                            Intent intent = new Intent(MainActivity.this, ManagementActivity.class);
+                            startActivity(intent);
+                        }
+                        dialog.dismiss();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            asyncTask.execute();
+        }catch (Exception e){
+            try {
+                throw e;
+            } catch (JSONException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+    private void saveToSharePre(int id,String pass, String name){
         SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("id", id);
+        editor.putString("pass", pass);
         editor.putString("name", name);
         editor.putBoolean("isConnected", true);
         editor.putString("fcmToken", fcmToken);

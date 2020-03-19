@@ -17,5 +17,10 @@ router.post('/create-history', function(req, res, next) {
 
 router.get('/load-history', function(req, res, next){
   apiController.loadHistory(req, res, next);
-})
+});
+
+router.post('/quit-wallet', function(req, res, next) {
+  apiController.quitWallet(req, res, next);
+});
+
 module.exports = router;

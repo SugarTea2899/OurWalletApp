@@ -45,6 +45,7 @@ public class CreateWalletActivity extends AppCompatActivity {
                     try {
                         jsonObject.put("memberName", edtName.getText().toString());
                         jsonObject.put("password", edtPasword.getText().toString());
+                        jsonObject.put("fcmToken", MainActivity.fcmToken);
 
                         final OkHttpClient httpClient = new OkHttpClient();
                         RequestBody body = RequestBody.create(jsonObject.toString(), MainActivity.JSON);
@@ -84,7 +85,7 @@ public class CreateWalletActivity extends AppCompatActivity {
                                     try {
                                         JSONObject jsonObject1 = new JSONObject(s);
                                         int walletId = jsonObject1.getInt("id");
-                                        saveToSharePre(walletId, edtName.getText().toString());
+                                        saveToSharePre(walletId, edtPasword.getText().toString(), edtName.getText().toString());
                                         Intent intent = new Intent(CreateWalletActivity.this, ManagementActivity.class);
                                         startActivity(intent);
                                     } catch (JSONException e) {
@@ -108,12 +109,14 @@ public class CreateWalletActivity extends AppCompatActivity {
         });
     }
 
-    private void saveToSharePre(int id, String name){
+    private void saveToSharePre(int id,String pass, String name){
         SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("id", id);
+        editor.putString("pass", pass);
         editor.putString("name", name);
         editor.putBoolean("isConnected", true);
+        editor.putString("fcmToken", MainActivity.fcmToken);
         editor.apply();
     }
     private boolean isMatch(){

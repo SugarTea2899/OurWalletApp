@@ -9,6 +9,7 @@ module.exports = {
         const pass = req.body.password;
         const memberName = req.body.memberName;
         const fcmToken = req.body.fcmToken;
+        const isAuto = req.body.isAuto;
 
         const wallet = await walletDB.findOne({id: id});
         if (wallet === null){
@@ -21,6 +22,17 @@ module.exports = {
         else{
             if (pass == wallet.password)
             {    
+                if (!isAuto){
+                    const sameNameMember = await memberDB.find({name: memberName});
+                    if (sameNameMember.length != 0){
+                        res.status(404).send({
+                            message: "Duplicate member name.",
+                            res: false
+                        });
+                        return;
+                    }
+                }
+                
                 const member = new memberDB({
                     name: memberName,
                     walletId: id
@@ -46,10 +58,15 @@ module.exports = {
         }
     },
     createWallet: async function(req, res, next){
-        const preWallet = await walletDB.findOne().sort('-id');
+        let preWallet = await walletDB.findOne().sort('-id');
+        if (preWallet === null)
+            preWallet = {id: 0};
+
+        console.log(preWallet);
         const id = preWallet.id + 1;
         const password = req.body.password;
         const memberName = req.body.memberName;
+        const fcmToken = req.body.fcmToken;
 
         const newWallet = new walletDB({
             id: id,
@@ -66,6 +83,12 @@ module.exports = {
                 walletId: id
             });
             await member.save();
+            
+            const newFcm = new fcmDB({
+                walletId: id,
+                fcmToken: fcmToken
+            });
+            await newFcm.save();
             res.send({
                 message: "Create wallet successfully.",
                 id: id
@@ -109,7 +132,6 @@ module.exports = {
             },
             tokens: regTokenList
         }
-        console.log(regTokenList);
         admin.messaging().sendMulticast(message)
             .then((res) => {
                 console.log("successfully");
@@ -137,5 +159,28 @@ module.exports = {
             });
         }
     
+    },
+    quitWallet: async function(req, res, next){
+        try{
+            const id = req.body.id;
+            const name = req.body.name;
+            const fcmToken = req.body.fcmToken;
+
+            await memberDB.deleteOne({walletId: id, name: name});
+            await fcmDB.deleteOne({fcmToken: fcmToken, walletId: id});
+
+            const members = await memberDB.find({walletId: id});
+            if (members.length == 0){
+                await walletDB.deleteOne({id: id});
+                await historyDB.deleteMany({walletId: id});
+            }
+            res.json({
+                res: true
+            });
+        }catch(e){
+            res.status(404).json({
+                res: false
+            })
+        }
     }
 }

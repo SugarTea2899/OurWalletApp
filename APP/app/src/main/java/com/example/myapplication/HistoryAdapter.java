@@ -67,8 +67,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
 
     public static String formatMoney(long money){
         int count = 0;
+        int condition = 0;
+        if (money < 0)
+            condition = 1;
         StringBuffer result = new StringBuffer(money + "");
-        for (int i = result.length() - 1; i > 0; i--){
+        for (int i = result.length() - 1; i > condition; i--){
             count++;
             if (count == 3){
                 count = 0;
