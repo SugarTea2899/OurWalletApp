@@ -16,7 +16,10 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -124,13 +127,33 @@ public class ManagementActivity extends AppCompatActivity {
         final EditText edtValue = (EditText) dialog.findViewById(R.id.edt_value);
         Button btnSave = (Button) dialog.findViewById(R.id.btn_save);
 
+        edtValue.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String money = s.toString();
+                if (!checkFormat(money)){
+                    edtValue.setText(formatMoney(money));
+                    edtValue.setSelection(edtValue.getText().length());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 HistoryItemModel item = new HistoryItemModel();
 
                 item.content = edtContent.getText().toString();
-                item.value =  Integer.parseInt(edtValue.getText().toString());
+                item.value =  reFormat(edtValue.getText().toString());
 
                 Date now = Calendar.getInstance().getTime();
                 SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -351,6 +374,47 @@ public class ManagementActivity extends AppCompatActivity {
         });
     }
 
+    private boolean checkFormat(String money){
+        if (money.length() == 0) return true;
+        int count = 0;
+        int size = 0;
+        for (int i = 0; i < money.length(); i++){
+            if (money.charAt(i) == '.'){
+                count++;
+            }else{
+                size++;
+            }
+        }
+        if (count == ((size - 1) / 3))
+        {
+            if (money.length() <= 3)
+                return true;
+            else{
+                if (money.charAt(money.length() - 4) == '.')
+                    return true;
+            }
+        }
+
+        return false;
+    }
+    private String formatMoney(String money){
+        money = money.replaceAll("\\.", "");
+        StringBuffer res = new StringBuffer(money);
+        int count = 0;
+        for (int i = res.length() - 1; i > 0; i--){
+            count++;
+            if (count == 3){
+                res.insert(i, '.');
+                count = 0;
+            }
+        }
+        return res.toString();
+    }
+
+    private int reFormat(String money){
+        money = money.replaceAll("\\.", "");
+        return Integer.parseInt(money);
+    }
 
     private void getWidget(){
         itemModels = new ArrayList<HistoryItemModel>();
