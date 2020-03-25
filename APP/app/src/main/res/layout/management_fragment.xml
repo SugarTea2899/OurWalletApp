@@ -70,8 +70,7 @@
         android:layout_marginRight="15dp"
         android:layout_below="@id/layout"
         android:layout_marginTop="20dp"
-        android:layout_above="@id/nav_bar"
-        android:layout_marginBottom="7dp"
+        android:layout_marginBottom="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -79,7 +78,7 @@
         android:id="@+id/imgb_menu"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="4dp"
-        android:layout_above="@id/nav_bar"
+        android:layout_alignParentBottom="true"
         android:layout_width="50dp"
         android:layout_marginRight="6dp"
         android:layout_height="50dp"
@@ -115,16 +114,5 @@
         android:scaleType="fitXY"
         android:src="@drawable/close_icon"
         android:background="@android:color/transparent"/>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/nav_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:itemBackground="@android:color/transparent"
-        android:background="@color/blue_logo"
-        android:layout_alignParentBottom="true"
-        app:itemTextColor="@color/bnv_item_color"
-        app:itemIconTint="@color/bnv_item_color"
-        app:menu="@menu/bottom_navigation"/>
 
 </RelativeLayout>

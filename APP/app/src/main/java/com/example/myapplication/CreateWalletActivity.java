@@ -46,6 +46,7 @@ public class CreateWalletActivity extends AppCompatActivity {
                         jsonObject.put("memberName", edtName.getText().toString());
                         jsonObject.put("password", edtPasword.getText().toString());
                         jsonObject.put("fcmToken", MainActivity.fcmToken);
+                        jsonObject.put("deviceId", MainActivity.DEVICE_ID);
 
                         final OkHttpClient httpClient = new OkHttpClient();
                         RequestBody body = RequestBody.create(jsonObject.toString(), MainActivity.JSON);
@@ -86,7 +87,7 @@ public class CreateWalletActivity extends AppCompatActivity {
                                         JSONObject jsonObject1 = new JSONObject(s);
                                         int walletId = jsonObject1.getInt("id");
                                         saveToSharePre(walletId, edtPasword.getText().toString(), edtName.getText().toString());
-                                        Intent intent = new Intent(CreateWalletActivity.this, ManagementActivity.class);
+                                        Intent intent = new Intent(CreateWalletActivity.this, container.class);
                                         startActivity(intent);
                                     } catch (JSONException e) {
                                         e.printStackTrace();

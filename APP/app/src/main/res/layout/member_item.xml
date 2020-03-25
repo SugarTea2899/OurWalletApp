@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_marginBottom="15dp"
+    android:paddingBottom="8dp"
+    android:paddingTop="8dp"
+    android:weightSum="2"
+    android:background="@drawable/rounded_edittext"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <RelativeLayout
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+            android:paddingLeft="10dp"
+            android:id="@+id/tv_memberName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_centerVertical="true"
+            android:textColor="@color/blue_logo"
+            android:drawableLeft="@drawable/ic_member"
+            android:drawablePadding="10dp"
+            android:text="Thien"
+            android:textStyle="bold"/>
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_marginRight="25dp"
+        android:layout_height="wrap_content">
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/sbtn_block"
+            android:layout_width="wrap_content"
+            android:layout_alignParentRight="true"
+            app:switchMinWidth="60dp"
+            android:layout_height="wrap_content"
+            android:text="Chặn "
+            android:textSize="18sp" />
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/sbtn_editable"
+            android:layout_width="wrap_content"
+            android:layout_below="@id/sbtn_block"
+            android:layout_alignParentRight="true"
+            app:switchMinWidth="60dp"
+            android:layout_height="wrap_content"
+            android:text="Thêm thu/chi "
+            android:textSize="18sp" />
+    </RelativeLayout>
+</LinearLayout>

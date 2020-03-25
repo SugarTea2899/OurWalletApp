@@ -7,7 +7,8 @@ const walletSchema = new mongoose.Schema({
     remain: Number,
     revenue: Number,
     expenditure: Number,
-    password: String
+    password: String,
+    superAdminId: String
 },{collection: 'wallet'});
 
 module.exports = mongoose.model('wallet', walletSchema);

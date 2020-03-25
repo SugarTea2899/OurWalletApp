@@ -10,12 +10,13 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:usesCleartextTraffic="true"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name="com.example.myapplication.ManagementActivity"></activity>
-        <activity android:name="com.example.myapplication.CreateWalletActivity" />
-        <activity android:name="com.example.myapplication.MainActivity">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".container"></activity>
+        <activity android:name=".ManagementActivity" />
+        <activity android:name=".CreateWalletActivity" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -42,12 +44,14 @@ public class MainActivity extends AppCompatActivity {
     public static String fcmToken;
     public static final String ADDRESS = "https://wallet-api-quangthien.herokuapp.com/api/";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    public static String DEVICE_ID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWidget();
 
+        DEVICE_ID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
             @Override
             public void onComplete(@NonNull Task<InstanceIdResult> task) {
@@ -78,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
                     jsonObject.put("password", edtWalletPass.getText().toString());
                     jsonObject.put("memberName", edtUserName.getText().toString());
                     jsonObject.put("fcmToken", fcmToken);
+                    jsonObject.put("deviceId", DEVICE_ID);
                     jsonObject.put("isAuto", false);
                     RequestBody body = RequestBody.create(jsonObject.toString(), JSON);
                     final Request request = new Request.Builder()
@@ -106,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         protected void onProgressUpdate(Void... values) {
+
                             dialog.show();
                         }
 
@@ -117,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), object.getString("message"), Toast.LENGTH_SHORT).show();
                                 }else{
                                     saveToSharePre(Integer.parseInt(edtWalletID.getText().toString()),edtWalletPass.getText().toString(), edtUserName.getText().toString());
-                                    Intent intent = new Intent(MainActivity.this, ManagementActivity.class);
+                                    Intent intent = new Intent(MainActivity.this, container.class);
                                     startActivity(intent);
                                 }
                                 dialog.dismiss();
@@ -155,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
             jsonObject.put("memberName", name);
             jsonObject.put("fcmToken", fcm);
             jsonObject.put("isAuto", true);
+            jsonObject.put("deviceId", DEVICE_ID);
             RequestBody body = RequestBody.create(jsonObject.toString(), JSON);
             final Request request = new Request.Builder()
                     .url(ADDRESS + "connect-wallet")
@@ -182,17 +189,23 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 protected void onProgressUpdate(Void... values) {
+                    SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+                    int walletId = sharedPreferences.getInt("id", 0);
+                    edtWalletID.setText(walletId + "");
+                    edtWalletPass.setText(sharedPreferences.getString("pass", ""));
+                    edtUserName.setText(sharedPreferences.getString("name", ""));
                     dialog.show();
                 }
 
                 @Override
                 protected void onPostExecute(String s) {
                     try {
+
                         JSONObject object =  new JSONObject(s);
                         if (object.getBoolean("res") == false){
                             Toast.makeText(getApplicationContext(), object.getString("message"), Toast.LENGTH_SHORT).show();
                         }else{
-                            Intent intent = new Intent(MainActivity.this, ManagementActivity.class);
+                            Intent intent = new Intent(MainActivity.this, container.class);
                             startActivity(intent);
                         }
                         dialog.dismiss();

@@ -4,7 +4,11 @@ mongoose.connect(process.env.URI, { useUnifiedTopology: true, useNewUrlParser: t
 
 const memberSchema = new mongoose.Schema({
     name: String,
-    walletId: Number
+    walletId: Number,
+    isBanned: Boolean,
+    isAdmin: Boolean,
+    deviceId: String,
+    isSuperAdmin: Boolean
 },{collection: 'member'});
 
 module.exports = mongoose.model('member', memberSchema);

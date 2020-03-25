@@ -10,7 +10,7 @@
         android:id="@+id/logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/logo"
+        android:text="@string/create_wallet_logo"
         android:textColor="@color/blue_logo"
         android:textSize="35dp"
         android:layout_centerHorizontal="true"
