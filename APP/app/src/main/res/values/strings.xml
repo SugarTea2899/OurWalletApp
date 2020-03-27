@@ -10,8 +10,10 @@
     <string name="repeat_pass">Nhập lại mật khẩu</string>
     <string name="choose_date">Chọn ngày để lọc</string>
     <string name="enter_content">Nhập nội dung</string>
+    <string name="enter_payMemberName">Nhập tên người chi trả</string>
     <string name="create_wallet_logo">Tạo Ví</string>
     <string name="enter_value">Nhập sô tiền</string>
+    <string name="enter_date">Chọn ngày</string>
     <string-array name="options">
         <item>Thu</item>
         <item>Chi</item>

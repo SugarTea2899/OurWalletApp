@@ -31,6 +31,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Quang Thiện"
+            android:textColor="#880101" />
+        <TextView
+            android:id="@+id/tv_payMemberName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quang Thiện"
             android:textColor="@color/blue_logo" />
     </LinearLayout>
     <RelativeLayout

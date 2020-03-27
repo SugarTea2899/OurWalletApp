@@ -4,7 +4,8 @@ mongoose.connect(process.env.URI, { useUnifiedTopology: true, useNewUrlParser: t
 
 const fcmSchema = new mongoose.Schema({
     walletId: Number,
-    fcmToken: String
+    fcmToken: String,
+    memberId: String
 },{collection: 'fcmToken'});
 
 module.exports = mongoose.model('fcmToken', fcmSchema);

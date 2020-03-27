@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="10">
+        <EditText
+            android:id="@+id/edt_oriDate"
+            android:layout_weight="4"
+            android:paddingLeft="8dp"
+            android:paddingTop="4dp"
+            android:textSize="22sp"
+            android:textStyle="italic"
+            android:inputType="date"
+            android:focusableInTouchMode="false"
+            android:paddingBottom="4dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edittext"
+            android:hint="@string/enter_date"/>
+
+        <TextView
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textStyle="bold|italic"
+            android:textColor="@color/blue_logo"
+            android:text="Đến"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:id="@+id/edt_desDate"
+            android:layout_weight="4"
+            android:paddingLeft="8dp"
+            android:paddingTop="4dp"
+            android:inputType="date"
+            android:focusableInTouchMode="false"
+            android:textStyle="italic"
+            android:textSize="22sp"
+            android:paddingBottom="4dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edittext"
+            android:hint="@string/enter_date"/>
+    </LinearLayout>
+    <Button
+        android:id="@+id/btn_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lọc"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/border_button"
+        android:layout_below="@id/linear_layout"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_statistic"
+        android:layout_width="match_parent"
+        android:layout_marginTop="8dp"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp"
+        android:layout_above="@id/btn_statistic"
+        android:layout_below="@id/btn_filter"/>
+
+    <Button
+        android:id="@+id/btn_statistic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:layout_centerHorizontal="true"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="8dp"
+        android:text="Thống kê"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/border_button"/>
+</RelativeLayout>

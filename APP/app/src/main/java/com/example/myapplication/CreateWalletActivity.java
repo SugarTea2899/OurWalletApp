@@ -85,6 +85,8 @@ public class CreateWalletActivity extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), "Tạo ví thành công", Toast.LENGTH_SHORT).show();
                                     try {
                                         JSONObject jsonObject1 = new JSONObject(s);
+                                        container.isAdmin = jsonObject1.getBoolean("isAdmin");
+                                        container.isSuperAdmin = jsonObject1.getBoolean("isSuperAdmin");
                                         int walletId = jsonObject1.getInt("id");
                                         saveToSharePre(walletId, edtPasword.getText().toString(), edtName.getText().toString());
                                         Intent intent = new Intent(CreateWalletActivity.this, container.class);

@@ -4,6 +4,11 @@ const historyDB = require('../models/history');
 const admin = require('../config/firebase');
 const fcmDB = require('../models/fcmToken');
 const banList = require('../models/banList');
+
+function formatDate(dateStr){
+    const tokens = dateStr.split('-');
+    return tokens[1] + '-' + tokens[0] + '-' + tokens[2];
+}
 module.exports = {
     connectWallet: async function(req, res, next){
         const id = req.body.id;
@@ -52,23 +57,27 @@ module.exports = {
                     });
                     const newFcm = new fcmDB({
                         walletId: id,
-                        fcmToken: fcmToken
+                        fcmToken: fcmToken,
+                        memberId: member._id
                     });
                     await newFcm.save();
                     await member.save();
     
                     res.send({
                         res: true,
-                        isSuperAdmin: false
+                        isSuperAdmin: false,
+                        isAdmin: true
                     });
 
                 }else{
                     const superAdmin = await memberDB.findById(wallet.superAdminId);
+                    const member = await memberDB.findOne({walletId: id, name: memberName});
                     let isSuperAdmin;
                     if (superAdmin.name == memberName) isSuperAdmin = true; else isSuperAdmin = false;    
                     res.send({
                         res: true,
-                        isSuperAdmin: isSuperAdmin
+                        isSuperAdmin: isSuperAdmin,
+                        isAdmin: member.isAdmin
                     });
                 }
             }
@@ -114,13 +123,15 @@ module.exports = {
 
             const newFcm = new fcmDB({
                 walletId: id,
-                fcmToken: fcmToken
+                fcmToken: fcmToken,
+                memberId: member._id
             });
             await newFcm.save();
             res.send({
                 message: "Create wallet successfully.",
                 id: id,
-                isSuperAdmin: true
+                isSuperAdmin: true,
+                isAdmin: true
             });
         }catch(e){
             res.status(404);
@@ -134,6 +145,7 @@ module.exports = {
         const value = req.body.value;
         const isRevenue = req.body.isRevenue;
         const name = req.body.name;
+        const payMemberName = req.body.payMemberName;
         const fcm = req.body.fcmToken;
         const describe = req.body.describe;
         const now = new Date();
@@ -144,7 +156,8 @@ module.exports = {
             isRevenue: isRevenue,
             createOn: now,
             name: name,
-            describe: describe
+            describe: describe,
+            payMemberName: payMemberName
         });
 
         await history.save();
@@ -158,6 +171,7 @@ module.exports = {
         const message = {
             data: {
                 fcmToken: fcm,
+                type: '1'
             },
             tokens: regTokenList
         }
@@ -184,7 +198,7 @@ module.exports = {
             res.status(200).json(history);
         }catch(e){
             res.status(404).send({
-                message: "failed to load history."
+                message: e.message
             });
         }
     
@@ -208,7 +222,8 @@ module.exports = {
             });
         }catch(e){
             res.status(404).json({
-                res: false
+                res: false,
+                mesaage: e.mesaage
             })
         }
     },
@@ -230,6 +245,21 @@ module.exports = {
                 });
                 await banListDoc.save();
                 await bannedMember.save();
+
+                const fcmData = await fcmDB.findOne({memberId: bannedMember._id});
+                const message = {
+                    data: {
+                        type: '2'
+                    },
+                    token: fcmData.fcmToken
+                };
+                admin.messaging().send(message)
+                    .then((response) => {
+                        console.log('Successfully sent message:', response);
+                    })
+                    .catch((error) => {
+                        console.log('Error sending message:', error);
+                    });
                 res.send({
                     res: true
                 });
@@ -243,9 +273,8 @@ module.exports = {
         }catch(e){
             res.status(404).send({
                 res: false,
-                message: "Exception..."
+                message: e.mesaage
             });
-            next(e);
             return;
         }
     },
@@ -273,9 +302,116 @@ module.exports = {
             res.json(memebers);
         } catch (error) {
             res.status(404).send({
-                message: "Load list member failed."
+                message: error.message
             });
         }
         
+    },
+    unBanUser: async function(req, res, next){
+        try {
+            const id = req.body.walletId;
+            const name = req.body.name;
+            const member = await memberDB.findOne({walletId: id, name: name});
+            member.isBanned = false;
+            await member.save();
+            await banList.deleteOne({memberId: member._id});
+            const fcmData = await fcmDB.findOne({memberId: member._id});
+            const message = {
+                data: {
+                    type: '3'
+                },
+                token: fcmData.fcmToken
+            }
+            admin.messaging().send(message)
+                .then((response) => {
+                    console.log('Successfully sent message:', response);
+                })
+                .catch((error) => {
+                    console.log('Error sending message:', error);
+            });
+        res.send({
+            res: true
+        });
+            res.send({
+                res: true
+            })
+        } catch (error) {
+            res.status(404).send({
+                res:false,
+                mesaage: error.message
+            });
+        }
+    },
+    banEdit: async function(req, res, next){
+        const id = req.body.walletId;
+        const name = req.body.name;
+        const isAdmin = req.body.isAdmin;
+
+        try {
+            const member = await memberDB.findOne({walletId: id, name: name});
+            member.isAdmin = isAdmin;
+            await member.save();
+
+            const fcmData = await fcmDB.findOne({memberId: member._id});
+            let isAdminStr;
+            if (isAdmin) isAdminStr = '1'; else isAdminStr = '0';
+            const message = {
+                data: {
+                    type: '4',
+                    isAdmin: isAdminStr
+                },
+                token: fcmData.fcmToken
+            }
+            admin.messaging().send(message)
+                .then((response) => {
+                    console.log('Successfully sent message:', response);
+                })
+                .catch((error) => {
+                    console.log('Error sending message:', error);
+            });
+            res.send({
+                res: true
+            });
+        } catch (error) {
+            res.status(404).send({
+                res: false,
+                mesaage: error.mesaage
+            });
+        }
+    },
+    statistic: async function(req, res, next){
+        let oriDate = req.body.oriDate;
+        let desDate = req.body.desDate;
+        const id = req.body.walletId;
+        if (oriDate === undefined || desDate === undefined){
+            res.status(404).send({
+                res: false,
+                message: "invaid var"
+            });
+            return;
+        }
+        try{
+            oriDate = new Date(formatDate(oriDate));
+            desDate = new Date(formatDate(desDate));
+            desDate.setDate(desDate.getDate() + 1);
+            console.log(desDate);
+            if (oriDate > desDate)
+            {
+                res.status(404).send({
+                    res: false,
+                    message: "invaid date"
+                });
+                return;
+            }
+            const historys = await historyDB.find({walletId: id, createOn: {$gte: oriDate, $lte: desDate}}).sort({createOn: -1});
+            res.json(historys);
+        } catch (error) {
+            res.status(404).send({
+                res: false, 
+                message: error.message
+            });
+            return;
+        }
     }
+
 }

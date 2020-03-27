@@ -37,4 +37,17 @@ router.post('/check-superadmin', function(req, res, next) {
 router.post('/list-member', function(req, res, next) {
   apiController.loadListMember(req, res, next);
 });
+
+router.post('/unban-user', function(req, res, next) {
+  apiController.unBanUser(req, res, next);
+});
+
+router.post('/ban-edit', function(req, res, next) {
+  apiController.banEdit(req, res, next);
+});
+
+
+router.post('/statistic', function(req, res, next) {
+  apiController.statistic(req, res, next);
+});
 module.exports = router;

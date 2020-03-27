@@ -10,6 +10,7 @@ public class HistoryItemModel {
     public String name;
     public long value;
     public boolean isRevenue;
+    public String payMemberName;
 
     public HistoryItemModel(String content, String date, String userName, long value, boolean isRevenues) {
         this.content = content;

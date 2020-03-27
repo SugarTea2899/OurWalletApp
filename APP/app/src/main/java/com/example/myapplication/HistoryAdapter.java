@@ -34,6 +34,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         holder.tvContent.setText(item.content);
         holder.tvDate.setText(item.date);
         holder.tvUsername.setText(item.name);
+        holder.tvPayMemberName.setText(item.payMemberName);
         String temp = formatMoney(item.value);
 
         if (item.isRevenue)
@@ -53,6 +54,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         public TextView tvDate;
         public TextView tvUsername;
         public TextView tvValue;
+        public TextView tvPayMemberName;
 
         public HistoryViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -61,6 +63,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             tvDate = (TextView) itemView.findViewById(R.id.tv_date);
             tvUsername = (TextView) itemView.findViewById(R.id.tv_userName);
             tvValue = (TextView) itemView.findViewById(R.id.tv_value);
+            tvPayMemberName = (TextView) itemView.findViewById(R.id.tv_payMemberName);
 
         }
     }

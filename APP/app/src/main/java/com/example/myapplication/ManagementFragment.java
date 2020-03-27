@@ -68,10 +68,9 @@ public class ManagementFragment extends Fragment {
     ArrayList<HistoryItemModel> itemModels;
     HistoryAdapter adapter;
     SharedPreferences sharedPreferences;
-    boolean doubleBackToExitPressedOnce = false;
-    int id;
+    public static int id;
     long remain = 0, revenues = 0, expenditures = 0;
-    String name;
+    public static String name;
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -111,6 +110,7 @@ public class ManagementFragment extends Fragment {
 
         final EditText edtContent = (EditText) dialog.findViewById(R.id.edt_content);
         final EditText edtValue = (EditText) dialog.findViewById(R.id.edt_value);
+        final EditText edtPayMemberName = (EditText) dialog.findViewById(R.id.edt_payMemberName);
         Button btnSave = (Button) dialog.findViewById(R.id.btn_save);
 
         edtValue.addTextChangedListener(new TextWatcher() {
@@ -140,7 +140,7 @@ public class ManagementFragment extends Fragment {
 
                 item.content = edtContent.getText().toString();
                 item.value =  reFormat(edtValue.getText().toString());
-
+                item.payMemberName = edtPayMemberName.getText().toString();
                 Date now = Calendar.getInstance().getTime();
                 SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
                 String nowString = df.format(now);
@@ -167,14 +167,14 @@ public class ManagementFragment extends Fragment {
                 itemModels.add(0, item);
                 HistoryAdapter adapter1 = new HistoryAdapter(itemModels, getContext());
                 recyclerView.setAdapter(adapter1);
-                postHistoryToSever(id, item.value, item.isRevenue, item.name, item.content);
+                postHistoryToSever(id, item.value, item.isRevenue, item.name, item.content, item.payMemberName);
                 dialog.dismiss();
             }
         });
 
         dialog.show();
     }
-    private void postHistoryToSever(int walletId, long value, boolean isRevenue, String name, String describe){
+    private void postHistoryToSever(int walletId, long value, boolean isRevenue, String name, String describe, String payMemberName){
         JSONObject jsonObject = new JSONObject();
         try{
             jsonObject.put("walletId", walletId);
@@ -183,6 +183,7 @@ public class ManagementFragment extends Fragment {
             jsonObject.put("name", name);
             jsonObject.put("describe", describe);
             jsonObject.put("fcmToken", MainActivity.fcmToken);
+            jsonObject.put("payMemberName", payMemberName);
             final OkHttpClient httpClient = new OkHttpClient();
             RequestBody body = RequestBody.create(jsonObject.toString(), MainActivity.JSON);
             final Request request = new Request.Builder()
@@ -214,10 +215,14 @@ public class ManagementFragment extends Fragment {
                 .url(MainActivity.ADDRESS + "load-history?id=" + id)
                 .build();
 
+        final ProgressDialog dialog = new ProgressDialog(getContext());
+        dialog.setTitle("Đang load lịch sử");
+        dialog.setMessage("Xin chờ...");
         @SuppressLint("StaticFieldLeak") AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... voids) {
                 try {
+                    publishProgress();
                     Response response = okHttpClient.newCall(request).execute();
                     if (response.isSuccessful())
                         return response.body().string();
@@ -226,6 +231,11 @@ public class ManagementFragment extends Fragment {
                     e.printStackTrace();
                     return null;
                 }
+            }
+
+            @Override
+            protected void onProgressUpdate(Void... values) {
+                dialog.show();
             }
 
             @Override
@@ -240,7 +250,10 @@ public class ManagementFragment extends Fragment {
                     }
                     adapter = new HistoryAdapter(itemModels, getContext());
                     recyclerView.setAdapter(adapter);
+                }else{
+                    Toast.makeText(getContext(), "Load lịch sử thất bại.", Toast.LENGTH_SHORT).show();
                 }
+                dialog.dismiss();
             }
         };
         asyncTask.execute();
@@ -289,6 +302,10 @@ public class ManagementFragment extends Fragment {
             public void onClick(View v) {
                 hideFunctionButton();
                 isHidden = true;
+                if (!container.isAdmin){
+                    Toast.makeText(getContext(), "Bạn đã bị chặn quyền thêm thu chi.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 showAddNewDialog();
             }
         });
@@ -342,6 +359,7 @@ public class ManagementFragment extends Fragment {
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putBoolean("isConnected", false);
                                 editor.apply();
+                                LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
                                 getActivity().finish();
                             }
                             dialog.dismiss();
@@ -395,6 +413,12 @@ public class ManagementFragment extends Fragment {
     private int reFormat(String money){
         money = money.replaceAll("\\.", "");
         return Integer.parseInt(money);
+    }
+
+    @Override
+    public void onDestroy() {
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
+        super.onDestroy();
     }
 
     private void getWidget(View view){

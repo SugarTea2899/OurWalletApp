@@ -2,10 +2,14 @@ package com.example.myapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -45,6 +49,18 @@ public class MainActivity extends AppCompatActivity {
     public static final String ADDRESS = "https://wallet-api-quangthien.herokuapp.com/api/";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     public static String DEVICE_ID;
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(getApplicationContext(), "Bạn đã được gỡ chặn khỏi ví này.", Toast.LENGTH_SHORT).show();
+            SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+            boolean isConnected = sharedPreferences.getBoolean("isConnected", false);
+            if (isConnected){
+                autoConnect(sharedPreferences.getInt("id", -1), sharedPreferences.getString("pass", ""),
+                        sharedPreferences.getString("name", ""), sharedPreferences.getString("fcmToken", ""));
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter("BeUnBanned"));
         SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
         boolean isConnected = sharedPreferences.getBoolean("isConnected", false);
         if (isConnected){
@@ -122,6 +139,8 @@ public class MainActivity extends AppCompatActivity {
                                 if (object.getBoolean("res") == false){
                                     Toast.makeText(getApplicationContext(), object.getString("message"), Toast.LENGTH_SHORT).show();
                                 }else{
+                                    container.isAdmin = object.getBoolean("isAdmin");
+                                    container.isSuperAdmin = object.getBoolean("isSuperAdmin");
                                     saveToSharePre(Integer.parseInt(edtWalletID.getText().toString()),edtWalletPass.getText().toString(), edtUserName.getText().toString());
                                     Intent intent = new Intent(MainActivity.this, container.class);
                                     startActivity(intent);
@@ -200,11 +219,13 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 protected void onPostExecute(String s) {
                     try {
-
+                        if (s == null) return;
                         JSONObject object =  new JSONObject(s);
                         if (object.getBoolean("res") == false){
                             Toast.makeText(getApplicationContext(), object.getString("message"), Toast.LENGTH_SHORT).show();
                         }else{
+                            container.isAdmin = object.getBoolean("isAdmin");
+                            container.isSuperAdmin = object.getBoolean("isSuperAdmin");
                             Intent intent = new Intent(MainActivity.this, container.class);
                             startActivity(intent);
                         }
@@ -224,7 +245,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    private void saveToSharePre(int id,String pass, String name){
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        super.onDestroy();
+    }
+
+    private void saveToSharePre(int id, String pass, String name){
         SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("id", id);
