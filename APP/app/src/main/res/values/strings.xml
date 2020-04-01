@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Our Wallet</string>
     <string name="logo">Ví Của Chúng Ta</string>
     <string name="enter_name">Nhập tên người dùng</string>
     <string name="wallet_id">Nhập ID ví</string>

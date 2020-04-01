@@ -45,6 +45,10 @@ public class MyService extends FirebaseMessagingService {
                 intent2.putExtra("isAdmin", isAdmin);
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent2);
                 break;
+            case "5":
+                Intent intent3 = new Intent("BeSuperAdmin");
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent3);
+                break;
         }
 
     }

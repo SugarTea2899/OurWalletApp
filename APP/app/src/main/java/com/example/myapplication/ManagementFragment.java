@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -51,7 +54,7 @@ import okhttp3.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class ManagementFragment extends Fragment {
+public class ManagementFragment extends Fragment implements HistoryAdapter.OnHistoryListener {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -136,6 +139,11 @@ public class ManagementFragment extends Fragment {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (edtContent.getText().toString().length() == 0 || edtValue.getText().toString().length() == 0 ||
+                        edtPayMemberName.getText().toString().length() == 0){
+                    Toast.makeText(getContext(), "Có thông tin bị rỗng.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 HistoryItemModel item = new HistoryItemModel();
 
                 item.content = edtContent.getText().toString();
@@ -146,6 +154,7 @@ public class ManagementFragment extends Fragment {
                 String nowString = df.format(now);
 
                 item.date = nowString;
+
 
                 int spinnerValue = spinner.getSelectedItemPosition();
                 if (spinnerValue == 0)
@@ -165,7 +174,7 @@ public class ManagementFragment extends Fragment {
                 item.name = name;
 
                 itemModels.add(0, item);
-                HistoryAdapter adapter1 = new HistoryAdapter(itemModels, getContext());
+                HistoryAdapter adapter1 = new HistoryAdapter(itemModels, getContext(), ManagementFragment.this);
                 recyclerView.setAdapter(adapter1);
                 postHistoryToSever(id, item.value, item.isRevenue, item.name, item.content, item.payMemberName);
                 dialog.dismiss();
@@ -248,7 +257,7 @@ public class ManagementFragment extends Fragment {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    adapter = new HistoryAdapter(itemModels, getContext());
+                    adapter = new HistoryAdapter(itemModels, getContext(), ManagementFragment.this);
                     recyclerView.setAdapter(adapter);
                 }else{
                     Toast.makeText(getContext(), "Load lịch sử thất bại.", Toast.LENGTH_SHORT).show();
@@ -314,61 +323,83 @@ public class ManagementFragment extends Fragment {
         imgbQuit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                JSONObject  jsonObject = new JSONObject();
-                try{
-                    jsonObject.put("id", id);
-                    jsonObject.put("name", name);
-                    jsonObject.put("fcmToken", sharedPreferences.getString("fcmToken", ""));
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Thoát ví");
+                builder.setMessage("Bạn có muốn thoát khỏi ví " + id + " ?");
+                builder.setCancelable(true);
+                builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int k) {
+                        dialogInterface.cancel();
+                        JSONObject  jsonObject = new JSONObject();
+                        try{
+                            jsonObject.put("id", id);
+                            jsonObject.put("name", name);
+                            jsonObject.put("fcmToken", sharedPreferences.getString("fcmToken", ""));
+                            jsonObject.put("isSuperAdmin", container.isSuperAdmin);
 
-                    RequestBody body = RequestBody.create(jsonObject.toString(), MainActivity.JSON);
-                    final OkHttpClient okHttpClient = new OkHttpClient();
-                    final Request request = new Request.Builder()
-                            .url(MainActivity.ADDRESS + "quit-wallet")
-                            .post(body)
-                            .build();
+                            RequestBody body = RequestBody.create(jsonObject.toString(), MainActivity.JSON);
+                            final OkHttpClient okHttpClient = new OkHttpClient();
+                            final Request request = new Request.Builder()
+                                    .url(MainActivity.ADDRESS + "quit-wallet")
+                                    .post(body)
+                                    .build();
 
-                    final ProgressDialog dialog = new ProgressDialog(getContext());
-                    dialog.setTitle("Đang thoát");
-                    dialog.setMessage("Xin chờ...");
-                    @SuppressLint("StaticFieldLeak") AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
-                        @Override
-                        protected String doInBackground(Void... voids) {
-                            try {
-                                publishProgress();
-                                Response response = okHttpClient.newCall(request).execute();
-                                if (response.isSuccessful())
-                                    return response.body().string();
-                                return null;
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                return null;
-                            }
+                            final ProgressDialog dialog = new ProgressDialog(getContext());
+                            dialog.setTitle("Đang thoát");
+                            dialog.setMessage("Xin chờ...");
+                            @SuppressLint("StaticFieldLeak") AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
+                                @Override
+                                protected String doInBackground(Void... voids) {
+                                    try {
+                                        publishProgress();
+                                        Response response = okHttpClient.newCall(request).execute();
+                                        if (response.isSuccessful())
+                                            return response.body().string();
+                                        return null;
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                        return null;
+                                    }
+                                }
+
+                                @Override
+                                protected void onProgressUpdate(Void... values) {
+                                    dialog.show();
+                                }
+
+                                @Override
+                                protected void onPostExecute(String s) {
+                                    if (s == null)
+                                    {
+                                        Toast.makeText(getContext(), "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
+                                    }else{
+                                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                                        editor.putBoolean("isConnected", false);
+                                        editor.apply();
+                                        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
+                                        getActivity().finish();
+                                    }
+                                    dialog.dismiss();
+                                }
+                            };
+                            asyncTask.execute();
+                        }catch (Exception e){
+                            Log.d("Exception", e.getMessage());
                         }
+                    }
+                });
 
-                        @Override
-                        protected void onProgressUpdate(Void... values) {
-                            dialog.show();
-                        }
+                builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int k) {
+                        dialogInterface.cancel();
+                    }
+                });
 
-                        @Override
-                        protected void onPostExecute(String s) {
-                            if (s == null)
-                            {
-                                Toast.makeText(getContext(), "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
-                            }else{
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putBoolean("isConnected", false);
-                                editor.apply();
-                                LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
-                                getActivity().finish();
-                            }
-                            dialog.dismiss();
-                        }
-                    };
-                    asyncTask.execute();
-                }catch (Exception e){
-                    Log.d("Exception", e.getMessage());
-                }
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
             }
         });
     }
@@ -432,5 +463,96 @@ public class ManagementFragment extends Fragment {
         tvRemain = (TextView) view.findViewById(R.id.tv_remainMoney);
         tvExpenditures = (TextView) view.findViewById(R.id.tv_expenditures);
         tvRevenues = (TextView) view.findViewById(R.id.tv_revenues);
+    }
+    private void postDelHistory(int walletId, String historyId, String fcmToken){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("walletId", walletId);
+            jsonObject.put("historyId", historyId);
+            jsonObject.put("fcmToken", fcmToken);
+
+            RequestBody body = RequestBody.create(jsonObject.toString(), MainActivity.JSON);
+            final Request request = new Request.Builder()
+                    .url(MainActivity.ADDRESS + "remove-history")
+                    .post(body)
+                    .build();
+
+            final OkHttpClient okHttpClient = new OkHttpClient();
+            final ProgressDialog dialog = new ProgressDialog(getContext());
+            dialog.setTitle("Đang xoá");
+            dialog.setMessage("Xin chờ...");
+            @SuppressLint("StaticFieldLeak") AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
+                @Override
+                protected String doInBackground(Void... voids) {
+                    try {
+                        publishProgress();
+                        Response response = okHttpClient.newCall(request).execute();
+                        if (response.isSuccessful())
+                            return response.body().string();
+                        return null;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                }
+
+                @Override
+                protected void onProgressUpdate(Void... values) {
+                    dialog.show();
+                }
+
+                @Override
+                protected void onPostExecute(String s) {
+                    if (s != null){
+                        Toast.makeText(getContext(), "Thành công.", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(getContext(), "Xoá thất bại.", Toast.LENGTH_SHORT).show();
+                        loadHistory(id);
+                    }
+                    dialog.dismiss();
+                }
+            };
+            asyncTask.execute();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+    @Override
+    public void onClick(int position) {
+        final int index = position;
+        if (container.isSuperAdmin){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle("Xoá lịch sử");
+            builder.setMessage("Dữ liệu sẽ không thể phục hồi, tiếp tục xoá? ");
+            builder.setCancelable(true);
+            builder.setNegativeButton("Xoá", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    HistoryItemModel temp = itemModels.get(index);
+                    if (temp.isRevenue){
+                        revenues -= temp.value;
+                    } else expenditures -= temp.value;
+
+                    remain = revenues - expenditures;
+                    tvRemain.setText(HistoryAdapter.formatMoney(remain));
+                    tvRevenues.setText("+" + HistoryAdapter.formatMoney(revenues));
+                    tvExpenditures.setText("-" + HistoryAdapter.formatMoney(expenditures));
+                    postDelHistory(ManagementFragment.id, temp._id, MainActivity.fcmToken );
+                    itemModels.remove(index);
+                    adapter.notifyDataSetChanged();
+                    dialog.cancel();
+                }
+            });
+            builder.setPositiveButton("Không", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int k) {
+                    dialogInterface.cancel();
+                }
+            });
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        }
     }
 }

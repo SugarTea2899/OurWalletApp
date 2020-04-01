@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:paddingTop="10dp">
 
     <LinearLayout
-        android:id="@+id/linear_layout"
+        android:id="@+id/linear_layout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -48,40 +49,90 @@
             android:background="@drawable/rounded_edittext"
             android:hint="@string/enter_date"/>
     </LinearLayout>
-    <Button
-        android:id="@+id/btn_filter"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/linear_layout2"
+        android:layout_width="match_parent"
+        android:layout_below="@id/linear_layout1"
         android:layout_height="wrap_content"
-        android:text="Lọc"
-        android:textColor="#ffffff"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:weightSum="2"
+
         android:layout_marginTop="8dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/border_button"
-        android:layout_below="@id/linear_layout"/>
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/tv_revenuesStatistic"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:text="+0đ"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:layout_marginRight="5dp"
+            android:textSize="20sp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:textStyle="bold"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_button_red"/>
+
+        <TextView
+            android:id="@+id/tv_expendituresStatistic"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:text="-0đ"
+            android:textAlignment="center"
+            android:paddingTop="4dp"
+            android:layout_marginLeft="5dp"
+            android:paddingBottom="4dp"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_button_gray"/>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_statistic"
         android:layout_width="match_parent"
-        android:layout_marginTop="8dp"
         android:layout_height="match_parent"
-        android:layout_marginBottom="8dp"
-        android:layout_above="@id/btn_statistic"
-        android:layout_below="@id/btn_filter"/>
+        android:layout_above="@id/layout1"
+        android:layout_below="@id/linear_layout2"
+        android:layout_marginTop="15dp" />
 
-    <Button
-        android:id="@+id/btn_statistic"
+    <RelativeLayout
+        android:id="@+id/layout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
         android:layout_centerHorizontal="true"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="#ffffff"
-        android:layout_marginBottom="8dp"
-        android:text="Thống kê"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/border_button"/>
+        android:layout_alignParentBottom="true">
+        <Button
+            android:id="@+id/btn_statistic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_marginRight="10dp"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#ffffff"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:text="Thống kê"
+            android:background="@drawable/border_button"/>
+        <Button
+            android:id="@+id/btn_removeAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:layout_marginLeft="10dp"
+            android:paddingRight="8dp"
+            android:layout_toRightOf="@id/btn_statistic"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#ffffff"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:text="Xoá"
+            android:background="@drawable/border_button"/>
+    </RelativeLayout>
+
+
 </RelativeLayout>

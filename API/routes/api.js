@@ -50,4 +50,16 @@ router.post('/ban-edit', function(req, res, next) {
 router.post('/statistic', function(req, res, next) {
   apiController.statistic(req, res, next);
 });
+
+router.get('/pay-member-list', function(req, res, next){
+  apiController.getPayMemberNameList(req, res, next);
+});
+
+router.post('/remove-history', function(req, res, next){
+  apiController.removeHistory(req, res, next);
+});
+
+router.post('/remove-historys', function(req, res, next) {
+  apiController.removeHistorys(req, res, next);
+});
 module.exports = router;

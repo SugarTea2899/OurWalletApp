@@ -14,17 +14,19 @@ import java.util.ArrayList;
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
     public ArrayList<HistoryItemModel> itemModelsResult;
     private Context context;
+    private OnHistoryListener mOnHistoryListner;
 
-    public HistoryAdapter(ArrayList<HistoryItemModel> itemModelsResult, Context context) {
+    public HistoryAdapter(ArrayList<HistoryItemModel> itemModelsResult, Context context, OnHistoryListener onHistoryListener) {
         this.itemModelsResult = itemModelsResult;
         this.context = context;
+        this.mOnHistoryListner = onHistoryListener;
     }
 
     @NonNull
     @Override
     public HistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_item, parent, false);
-        return new HistoryViewHolder(itemView);
+        return new HistoryViewHolder(itemView, mOnHistoryListner);
     }
 
     @Override
@@ -49,14 +51,15 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         return itemModelsResult.size();
     }
 
-    public class HistoryViewHolder extends RecyclerView.ViewHolder {
+    public class HistoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView tvContent;
         public TextView tvDate;
         public TextView tvUsername;
         public TextView tvValue;
         public TextView tvPayMemberName;
+        public OnHistoryListener onHistoryListener;
 
-        public HistoryViewHolder(@NonNull View itemView) {
+        public HistoryViewHolder(@NonNull View itemView, OnHistoryListener onHistoryListener) {
             super(itemView);
 
             tvContent = (TextView) itemView.findViewById(R.id.tv_content);
@@ -64,7 +67,14 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             tvUsername = (TextView) itemView.findViewById(R.id.tv_userName);
             tvValue = (TextView) itemView.findViewById(R.id.tv_value);
             tvPayMemberName = (TextView) itemView.findViewById(R.id.tv_payMemberName);
+            this.onHistoryListener = onHistoryListener;
+            itemView.setOnClickListener(this);
 
+        }
+
+        @Override
+        public void onClick(View v) {
+            onHistoryListener.onClick(getAdapterPosition());
         }
     }
 
@@ -83,5 +93,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         }
         result.insert(result.length(), "đ");
         return result.toString();
+    }
+
+    public interface OnHistoryListener {
+        void onClick(int position);
     }
 }

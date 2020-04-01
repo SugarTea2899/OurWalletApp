@@ -3,6 +3,7 @@ package com.example.myapplication;
 import com.google.gson.annotations.SerializedName;
 
 public class HistoryItemModel {
+    public String _id;
     @SerializedName("describe")
     public String content;
     @SerializedName("createOn")

@@ -43,6 +43,14 @@ public class container extends AppCompatActivity {
         }
     };
 
+    private BroadcastReceiver broadcastReceiver2 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(getApplicationContext(), "Bạn đã trở thành superadmin.", Toast.LENGTH_SHORT).show();
+            isSuperAdmin = true;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +58,7 @@ public class container extends AppCompatActivity {
         getWidget();
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter("BeBanned"));
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver1, new IntentFilter("BanEdit"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver2, new IntentFilter("BeSuperAdmin"));
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ManagementFragment()).commit();
         setEvent();
     }
@@ -83,6 +92,7 @@ public class container extends AppCompatActivity {
         if (doubleBackToExitPressedOnce) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
             LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver1);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver2);
             finishAffinity();
             return;
         }
@@ -104,6 +114,7 @@ public class container extends AppCompatActivity {
     protected void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver1);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver2);
         super.onDestroy();
     }
 
