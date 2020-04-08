@@ -62,4 +62,5 @@ router.post('/remove-history', function(req, res, next){
 router.post('/remove-historys', function(req, res, next) {
   apiController.removeHistorys(req, res, next);
 });
+
 module.exports = router;
