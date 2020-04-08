@@ -148,6 +148,11 @@ public class ManagementFragment extends Fragment implements HistoryAdapter.OnHis
 
                 item.content = edtContent.getText().toString();
                 item.value =  reFormat(edtValue.getText().toString());
+                if (item.value == -1)
+                {
+                    Toast.makeText(getContext(), "Không thể hiển thị 10 tỉ VNĐ trở lên.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 item.payMemberName = edtPayMemberName.getText().toString();
                 Date now = Calendar.getInstance().getTime();
                 SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -163,11 +168,31 @@ public class ManagementFragment extends Fragment implements HistoryAdapter.OnHis
                     item.isRevenue = false;
 
                 if (item.isRevenue)
+                {
                     revenues += item.value;
+                    if (revenues/10 >= 1000000000){
+                        Toast.makeText(getContext(), "Không thể hiển thị 10 tỉ VNĐ trở lên.", Toast.LENGTH_SHORT).show();
+                        revenues -= item.value;
+                        return;
+                    }
+                }
                 else
+                {
                     expenditures += item.value;
+                    if (expenditures/10 >= 1000000000){
+                        Toast.makeText(getContext(), "Không thể hiển thị 10 tỉ VNĐ trở lên.", Toast.LENGTH_SHORT).show();
+                        expenditures -= item.value;
+                        return;
+                    }
+                }
 
+                long backUp = remain;
                 remain = revenues - expenditures;
+                if (remain / 10  >= 1000000000){
+                    remain = backUp;
+                    Toast.makeText(getContext(), "Không thể hiển thị 10 tỉ VNĐ trở lên.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 tvRemain.setText(HistoryAdapter.formatMoney(remain));
                 tvRevenues.setText("+" + HistoryAdapter.formatMoney(revenues));
                 tvExpenditures.setText("-" + HistoryAdapter.formatMoney(expenditures));
@@ -441,9 +466,12 @@ public class ManagementFragment extends Fragment implements HistoryAdapter.OnHis
         return res.toString();
     }
 
-    private int reFormat(String money){
+    private long reFormat(String money){
         money = money.replaceAll("\\.", "");
-        return Integer.parseInt(money);
+        if (money.length() >= 11){
+            return -1;
+        }
+        return Long.parseLong(money);
     }
 
     @Override

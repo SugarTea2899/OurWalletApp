@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:paddingLeft="8dp"
         android:orientation="vertical"
-        android:layout_weight="2.5">
+        android:layout_weight="2">
         <TextView
             android:id="@+id/tv_content"
             android:layout_width="match_parent"
@@ -42,7 +42,7 @@
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1.5">
+        android:layout_weight="2">
         <TextView
             android:id="@+id/tv_value"
             android:layout_width="wrap_content"
@@ -52,6 +52,6 @@
             android:text="+500000đ"
             android:textColor="@color/blue_logo"
             android:textStyle="bold|italic"
-            android:textSize="20sp"/>
+            android:textSize="17sp"/>
     </RelativeLayout>
 </LinearLayout>

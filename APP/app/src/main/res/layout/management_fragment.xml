@@ -52,7 +52,7 @@
             android:textColor="#FFFFFF"
             android:textAlignment="center"
             android:background="@drawable/border_button_red"
-            android:textSize="20sp"/>
+            android:textSize="15sp"/>
         <TextView
             android:id="@+id/tv_expenditures"
             android:layout_margin="3dp"
@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:background="@drawable/border_button_gray"
-            android:textSize="20sp"/>
+            android:textSize="15sp"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
