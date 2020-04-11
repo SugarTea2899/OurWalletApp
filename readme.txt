@@ -4,3 +4,6 @@
 (gần như realtime tuỳ thuộc vào google firebase).
 - Người tạo ra ví có thể chặn một thành viên không thể truy xuất vào ví nữa (chặn trên deviceId) và có thể chặn thành viên chỉnh sửa thu chi.
 - Người tạo ra ví có thể thống kê thu chi trong tháng.
+
+
+**LINK DOWNLOAD APK: https://drive.google.com/open?id=19w3YvdicoJuHQ2_TAjB2u9rk5z804CeJ
